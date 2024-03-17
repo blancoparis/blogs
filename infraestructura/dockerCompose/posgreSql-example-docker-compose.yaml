@@ -10,6 +10,11 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - "pgdata:/Users/davidblancoparis/bd/localpg"
+      - "pgdata:/var/lib/postgresql/data"
 volumes:
   pgdata:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/davidblancoparis/bd/localpg

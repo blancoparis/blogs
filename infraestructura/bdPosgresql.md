@@ -5,7 +5,8 @@
 * Donde guardar los datos de postgresql
 * Inicializacion de la BD.
 
-> Recursos (https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/)
+> Recursos (https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/ > https://kinsta.com/es/blog/volumenes-docker-compose/
+> )
 
 ## creamos el fichero de docker-compose (compose.yaml)
 
@@ -52,7 +53,7 @@ services:
 
 Vamos a añadir donde queremos que se guarden los datos, para este caso vamos a utilizar la variable PGDATA.
 
-- [services.db.volumes]: Vamos a establecer el volumen que queremos que se guarde en el contenedor, en este caso vamos a guardar en la carpeta **pgdata:/Users/davidblancoparis/bd/localpg**.
+- [services.db.volumes]: Vamos a establecer el volumen que queremos que se guarde en el contenedor, en este caso vamos a guardar en la carpeta **pgdata:/var/lib/postgresql/data**.
 
 Hay que declararla
 
@@ -69,12 +70,56 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - "pgdata:/Users/davidblancoparis/bd/localpg"
+      - "pgdata:/var/lib/postgresql/data"
 volumes:
   pgdata:
 ```
 
 > PGDATA: Es el directorio donde se guardan los datos de la BD. (PG_VERSION (version de la bd) y base subdirectorio con los datos )
+
+> Ahora nos queda ver como vamos a configurar el volumen, para indicarle donde queremos que se guarde.
+
+## Configurar el volumen
+
+En nuestro ejemplo nos interesa, que los datos se guarden en una carpeta local (/Users/davidblancoparis/bd/localpg), para lo cual vamos a configurar las siguietnes variables:
+
+- driver: Tipo de driver que vamos a utilizar, en este caso vamos a utilizar local.
+- driver_opts: Opciones que vamos a utilizar, en este caso vamos a indicarle donde queremos que se guarde.
+- device: Directorio donde queremos que se guarde (/Users/davidblancoparis/bd/localpg).
+- o: (OPT) es la opción de driver. (bind)
+- type: none
+  > Este es el ejemplo para configurar un directorio, al parecer estan relaciando con el parametro opts de docker y se vincula al SO.
+
+```yaml
+version: "3.9"
+services:
+  db:
+    image: "postgres"
+    restart: "always"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "postgres"
+    ports:
+      - "5432:5432"
+    volumes:
+      - "pgdata:/var/lib/postgresql/data"
+volumes:
+  pgdata:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/davidblancoparis/bd/localpg
+```
+
+> Si se cambia la configuración del volumen, hay que eliminar el volumen y volver a crearlo.
+
+## Comandos para trabajar con los volumenes:
+
+- docker volume ls: Listar los volumenes.
+- docker volume rm <nombre_volumen>: Eliminar un volumen.
+- docker volume inspect <nombre_volumen>: Inspeccionar un volumen.
 
 ## Añadir un healthcheck
 
@@ -101,6 +146,11 @@ services:
         retries: "5"
 volumes:
   pgdata:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/davidblancoparis/bd/localpg
 ```
 
 ## Variables de entorno:
