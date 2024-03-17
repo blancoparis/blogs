@@ -2,6 +2,10 @@ version: "3.9"
 services:
   db:
     image: "postgres"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     restart: "always"
     environment:
       POSTGRES_USER: "postgres"

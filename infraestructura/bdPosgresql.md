@@ -121,6 +121,48 @@ volumes:
 - docker volume rm <nombre_volumen>: Eliminar un volumen.
 - docker volume inspect <nombre_volumen>: Inspeccionar un volumen.
 
+## Configurar los recursos
+
+En este caso lo que vamos a ver es como configurar la memoria.
+
+Se establece en la configuracion del servicio, en este caso vamos a establecer la memoria en 512MB.
+
+- [services.db.deploy.resources.limits.memory]: Establecemos la memoria en 512MB.
+
+```yaml
+deploy:
+  resources:
+    limits:
+      memory: 256M
+```
+
+```yaml
+version: "3.9"
+services:
+  db:
+    image: "postgres"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    restart: "always"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "postgres"
+    ports:
+      - "5432:5432"
+    volumes:
+      - "pgdata:/var/lib/postgresql/data"
+volumes:
+  pgdata:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/davidblancoparis/bd/localpg
+```
+
 ## Añadir un healthcheck
 
 Es un servicio que sirve para saber si el servidor esta levantado o caido, para lo cual usaremos el servicio pg_isready que nos dira si el servidor esta levantado o no.
