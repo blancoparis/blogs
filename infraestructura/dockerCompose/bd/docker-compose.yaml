@@ -7,6 +7,7 @@ services:
         limits:
           memory: 256M
     restart: "always"
+    container_name: postgres
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
@@ -21,4 +22,4 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /Users/davidblancoparis/bd/localpg
+      device: /Users/davidblancoparis/data/bd/localpg
