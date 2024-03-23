@@ -13,3 +13,15 @@ sudo apt install openssh-server
 ```bash
 sudo systemctl status ssh
 ```
+
+## Acviar el puerto
+
+```bash
+sudo ufw allow ssh
+``
+## Configurar el ssh
+
+```bash
+sudo nano /etc/ssh/sshd_config
+``
+pdb-GF75-Thin-9SD
