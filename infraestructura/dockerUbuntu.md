@@ -58,5 +58,10 @@ ssh-copy-id myremoteuser@REMOTE_IP
 ssh-add
 docker -H myremoteuser@REMOTE_IP ps
 ```
+Esta configuracion la ponemos en el fichero **~/.ssh/config**
 
-
+``bash
+Host *
+   AddKeysToAgent yes
+   UseKeychain yes  
+```
