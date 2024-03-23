@@ -35,8 +35,16 @@ if type brew &>/dev/null; then
 fi
 ```
 
+## sintax-high
 
+```bash
+brew install zsh-syntax-highlighting
+```
 
+```bash
+echo "source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> .zshrc
+
+```
 
 ## Tipologia
 
