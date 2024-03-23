@@ -60,7 +60,7 @@ docker -H myremoteuser@REMOTE_IP ps
 ```
 Esta configuracion la ponemos en el fichero **~/.ssh/config**
 
-``bash
+```bash
 Host *
    AddKeysToAgent yes
    UseKeychain yes  
