@@ -33,3 +33,18 @@ sudo systemctl restart docker.service
 ```
 sudo netstat -lntp | grep dockerd
 ```
+## Configurar el cliente en docker en mac
+
+1. Configuramos la variable DOCKER_HOST
+ ```bash
+  export DOCKER_HOST=<IP>
+ ```  
+2. Configuramos la variable DOCKER_PORT
+```bash
+  export DOCKER_PORT=2375
+```
+
+> Si esta cifrado hay que configurar DOCKER_TLS_VERIFY
+
+## Error (Cannot connect to the Docker daemon at tcp://<IP>:2375. Is the docker daemon running?)
+
