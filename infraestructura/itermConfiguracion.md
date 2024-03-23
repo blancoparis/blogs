@@ -58,4 +58,10 @@ MesloLGS NF Italic.ttf
 MesloLGS NF Bold Italic.tt
 > Hacemos click en cada uno de los archivos.
 
-2.  
+2.  Instalar
+```bash
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+```  
+3.  Set ZSH_THEME="powerlevel10k/powerlevel10k" in ~/.zshrc.
+
+
