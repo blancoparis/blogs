@@ -20,6 +20,24 @@ echo "source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh" >>
 
 ### completions
 
+```bash
+brew install zsh-completions
+```
+
+En el fichero **~/.zshrc**, al final ponemos
+
+```bash
+if type brew &>/dev/null; then
+  FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+ 
+  autoload -Uz compinit
+  compinit -u
+fi
+```
+
+
+
+
 ## Tipologia
 
 https://github.com/romkatv/powerlevel10k
