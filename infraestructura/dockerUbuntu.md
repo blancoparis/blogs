@@ -48,3 +48,15 @@ sudo netstat -lntp | grep dockerd
 
 ## Error (Cannot connect to the Docker daemon at tcp://<IP>:2375. Is the docker daemon running?)
 
+> https://stackoverflow.com/questions/63828607/docker-connect-to-remote-daemon-via-ssh-permission-denied-publickey/63830401#63830401
+> https://forums.docker.com/t/docker-compose-through-ssh-failing-and-referring-to-docker-example-com/115165/10
+
+Para pode conectarme por ssh he tenido que ejecutar los siguientes comandos:
+```bash
+ssh-keygen
+ssh-copy-id myremoteuser@REMOTE_IP
+ssh-add
+docker -H myremoteuser@REMOTE_IP ps
+```
+
+
