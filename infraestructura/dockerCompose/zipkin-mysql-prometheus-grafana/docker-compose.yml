@@ -1,0 +1,88 @@
+# This file uses the version 2 docker-compose file format, described here:
+# https://docs.docker.com/compose/compose-file/#version-2
+#
+# This runs the zipkin and zipkin-mysql containers, using docker-compose's
+# default networking to wire the containers together.
+#
+# Note that this file is meant for learning Zipkin, not production deployments.
+
+version: "3.8"
+
+services:
+  storage:
+    image: ghcr.io/openzipkin/zipkin-mysql:${TAG:-latest}
+    container_name: mysql
+    ports:
+      - 3306:3306
+  # The zipkin process services the UI, and also exposes a POST endpoint that
+  # instrumentation can send trace data to.
+  zipkin:
+    image: ghcr.io/openzipkin/zipkin:${TAG:-latest}
+    container_name: zipkin
+    # Environment settings are defined here https://github.com/openzipkin/zipkin/blob/master/zipkin-server/README.md#environment-variables
+    environment:
+      - STORAGE_TYPE=mysql
+      - MYSQL_HOST=storage
+      # Add the baked-in username and password for the zipkin-mysql image
+      - MYSQL_USER=zipkin
+      - MYSQL_PASS=zipkin
+    ports:
+      # Port used for the Zipkin UI and HTTP Api
+      - 9411:9411
+    # Uncomment to enable debug logging
+    # command: --logging.level.zipkin2=DEBUG
+    depends_on:
+      storage:
+        condition: service_healthy
+  dependencies:
+    image: ghcr.io/openzipkin/zipkin-dependencies
+    container_name: dependencies
+    user: root
+    entrypoint: /usr/sbin/crond -f
+    environment:
+      - STORAGE_TYPE=mysql
+      - MYSQL_HOST=storage
+      # Add the baked-in username and password for the zipkin-mysql image
+      - MYSQL_USER=zipkin
+      - MYSQL_PASS=zipkin
+    depends_on:
+      storage:
+        condition: service_healthy
+  prometheus:
+    # Use a quay.io mirror to prevent build outages due to Docker Hub pull quotas
+    # Use latest from https://quay.io/repository/prometheus/prometheus?tab=tags
+    image: quay.io/prometheus/prometheus:v2.48.0
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    depends_on:
+      zipkin:
+        condition: service_healthy
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    # Use a quay.io mirror to prevent build outages due to Docker Hub pull quotas
+    # Use latest from https://quay.io/repository/app-sre/grafana?tab=tags
+    image: quay.io/giantswarm/grafana:7.5.4
+    container_name: grafana
+    ports:
+      - 3000:3000
+    depends_on:
+      - prometheus
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+
+  setup_grafana_datasource:
+    # This is an arbitrary small image that has curl installed
+    # Use a quay.io mirror to prevent build outages due to Docker Hub pull quotas
+    # Use latest from https://quay.io/repository/quay.io/rackspace/curl?tab=tags
+    image: quay.io/cilium/alpine-curl:v1.8.0
+    container_name: setup_grafana_datasource
+    depends_on:
+      - grafana
+    volumes:
+      - ./prometheus/create-datasource-and-dashboard.sh:/tmp/create.sh:ro
+    working_dir: /tmp
+    entrypoint: /tmp/create.sh

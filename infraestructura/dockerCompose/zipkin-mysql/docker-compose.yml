@@ -1,0 +1,50 @@
+# This file uses the version 2 docker-compose file format, described here:
+# https://docs.docker.com/compose/compose-file/#version-2
+#
+# This runs the zipkin and zipkin-mysql containers, using docker-compose's
+# default networking to wire the containers together.
+#
+# Note that this file is meant for learning Zipkin, not production deployments.
+
+version: "3.8"
+
+services:
+  storage:
+    image: ghcr.io/openzipkin/zipkin-mysql:${TAG:-latest}
+    container_name: mysql
+    ports:
+      - 3306:3306
+  # The zipkin process services the UI, and also exposes a POST endpoint that
+  # instrumentation can send trace data to.
+  zipkin:
+    image: ghcr.io/openzipkin/zipkin:${TAG:-latest}
+    container_name: zipkin
+    # Environment settings are defined here https://github.com/openzipkin/zipkin/blob/master/zipkin-server/README.md#environment-variables
+    environment:
+      - STORAGE_TYPE=mysql
+      - MYSQL_HOST=storage
+      # Add the baked-in username and password for the zipkin-mysql image
+      - MYSQL_USER=zipkin
+      - MYSQL_PASS=zipkin
+    ports:
+      # Port used for the Zipkin UI and HTTP Api
+      - 9411:9411
+    # Uncomment to enable debug logging
+    # command: --logging.level.zipkin2=DEBUG
+    depends_on:
+      storage:
+        condition: service_healthy
+  dependencies:
+    image: ghcr.io/openzipkin/zipkin-dependencies
+    container_name: dependencies
+    user: root
+    entrypoint: /usr/sbin/crond -f
+    environment:
+      - STORAGE_TYPE=mysql
+      - MYSQL_HOST=storage
+      # Add the baked-in username and password for the zipkin-mysql image
+      - MYSQL_USER=zipkin
+      - MYSQL_PASS=zipkin
+    depends_on:
+      storage:
+        condition: service_healthy
