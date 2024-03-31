@@ -113,7 +113,8 @@ Ahora vamos a ver como configurarlo para integrarlo con prometheus y grafana.
 
 Para este caso tenemos que crear los ficheros de configuracion:
 
-- create-datasource-and-dashboard.sh
+- create-datasource-and-dashboard.sh (Es importante que este fichero tenga permisos de ejecución)
+
 - prometheus.yml
 
 > Esto lo he sacado de los ejemplos de zipkin.
